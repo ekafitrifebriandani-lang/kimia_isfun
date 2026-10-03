@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#050b18">
+<title>Kimia Millionaire — Termokimia Kelas XI</title>
+
+<!-- Google Fonts via CDN -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============ VARIABEL & RESET ============ */
+:root{
+  --gold:#ffc93c;
+  --gold2:#ff9f1c;
+  --blue:#4fc3f7;
+  --green:#2ecc71;
+  --red:#e74c3c;
+  --panel:rgba(12,22,42,.82);
+  --panel2:rgba(18,32,58,.9);
+  --border:rgba(79,195,247,.28);
+  --txt:#eaf4ff;
+  --muted:#8fa8c4;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Poppins',system-ui,-apple-system,sans-serif;
+  background:radial-gradient(1200px 700px at 50% -10%,#0d2140 0%,#050b18 55%,#02060e 100%);
+  color:var(--txt);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* ============ BACKGROUND WEBGL ============ */
+#bg-canvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  display:block;
+  pointer-events:none;
+}
+
+/* ============ LAYOUT MOBILE ============ */
+.app{
+  position:relative;
+  z-index:2;
+  max-width:520px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:14px 14px calc(20px + env(safe-area-inset-bottom));
+  display:flex;
+  flex-direction:column;
+}
+.hidden{display:none !important}
+
+/* ============ KOMPONEN UMUM ============ */
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+.btn{
+  font-family:inherit;
+  font-weight:600;
+  font-size:15px;
+  border:none;
+  border-radius:14px;
+  padding:14px 18px;
+  cursor:pointer;
+  width:100%;
+  transition:transform .12s ease, filter .2s ease, box-shadow .2s;
+  color:#08111f;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  background:linear-gradient(180deg,var(--gold) 0%,var(--gold2) 100%);
+  box-shadow:0 6px 20px rgba(255,159,28,.35);
+}
+.btn-ghost{
+  background:transparent;
+  color:var(--blue);
+  border:1px solid var(--border);
+}
+.btn-ghost:active{background:rgba(79,195,247,.12)}
+
+/* ============ HOME ============ */
+.home-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding-top:24px;
+  animation:fadeUp .5s ease both;
+}
+.logo{
+  text-align:center;
+  padding:10px 0 4px;
+}
+.logo .kecil{
+  font-size:12px;
+  letter-spacing:3px;
+  color:var(--blue);
+  text-transform:uppercase;
+  font-weight:600;
+}
+.logo h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:30px;
+  line-height:1.15;
+  background:linear-gradient(180deg,#fff 10%,var(--gold) 60%,var(--gold2) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 0 30px rgba(255,201,60,.25);
+  margin:6px 0;
+  font-weight:800;
+}
+.logo p{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.5;
+}
+.field label{
+  font-size:12px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:6px;
+  font-weight:500;
+}
+.field input{
+  width:100%;
+  font-family:inherit;
+  font-size:15px;
+  padding:13px 14px;
+  border-radius:13px;
+  border:1px solid var(--border);
+  background:rgba(6,14,28,.85);
+  color:var(--txt);
+  outline:none;
+}
+.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,195,247,.15)}
+
+.stat-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.stat{
+  background:rgba(8,18,34,.75);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:10px 6px;
+  text-align:center;
+}
+.stat b{
+  display:block;
+  font-family:'Orbitron',sans-serif;
+  font-size:15px;
+  color:var(--gold);
+}
+.stat span{font-size:10px;color:var(--muted)}
+
+.section-title{
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--blue);
+  font-weight:600;
+  margin-bottom:8px;
+}
+.rank-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.rank-list li{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  padding:9px 11px;
+  background:rgba(8,18,34,.7);
+  border:1px solid rgba(79,195,247,.14);
+  border-radius:11px;
+}
+.rank-list .no{
+  font-family:'Orbitron',sans-serif;
+  font-size:12px;
+  color:var(--gold);
+  width:20px;
+  flex:0 0 20px;
+}
+.rank-list .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-list .sc{font-family:'Orbitron',sans-serif;font-size:12px;color:#fff}
+.empty{font-size:12px;color:var(--muted);text-align:center;padding:14px 0}
+
+/* ============ GAME ============ */
+.game-wrap{display:flex;flex-direction:column;gap:11px;animation:fadeUp .35s ease both}
+
+.game-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.chip{
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--txt);
+  background:rgba(8,18,34,.85);
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:8px 11px;
+  white-space:nowrap;
+}
+.chip.gold{color:var(--gold);border-color:rgba(255,201,60,.45)}
+button.chip{cursor:pointer;transition:.2s}
+button.chip:active{transform:scale(.95)}
+.game-top .spacer{flex:1}
+
+/* Lifelines */
+.lifelines{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.life{
+  font-family:inherit;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  padding:9px 4px;
+  border-radius:13px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(20,40,72,.9),rgba(9,18,34,.9));
+  color:var(--txt);
+  font-size:10.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+.life .ico{font-size:17px;line-height:1}
+.life:active{transform:scale(.95)}
+.life.used{
+  opacity:.34;
+  pointer-events:none;
+  filter:grayscale(1);
+  position:relative;
+}
+.life.used::after{
+  content:'✕';
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  color:var(--red);
+  font-weight:800;
+}
+
+/* Question */
+.q-card{
+  background:linear-gradient(180deg,rgba(14,28,52,.95),rgba(8,17,33,.95));
+  border:1px solid rgba(255,201,60,.28);
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 8px 26px rgba(0,0,0,.4);
+}
+.q-meta{
+  display:flex;
+  justify-content:space-between;
+  font-size:10.5px;
+  color:var(--muted);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  font-weight:600;
+}
+.q-text{
+  font-size:15px;
+  line-height:1.5;
+  font-weight:500;
+}
+
+/* Options */
+.options{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.option{
+  font-family:inherit;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  text-align:left;
+  padding:12px 13px;
+  border-radius:13px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(20,38,68,.9),rgba(9,18,34,.9));
+  color:var(--txt);
+  font-size:13.5px;
+  line-height:1.4;
+  cursor:pointer;
+  transition:.18s;
+}
+.option:active{transform:scale(.985)}
+.option .letter{
+  font-family:'Orbitron',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  color:var(--gold);
+  flex:0 0 auto;
+}
+.option .txt{flex:1}
+.option.correct{
+  background:linear-gradient(180deg,#1f8f4d,#14663a);
+  border-color:#2ecc71;
+  box-shadow:0 0 18px rgba(46,204,113,.45);
+  animation:pulseOk .5s ease;
+}
+.option.wrong{
+  background:linear-gradient(180deg,#a52f24,#7a2018);
+  border-color:#e74c3c;
+  box-shadow:0 0 18px rgba(231,76,60,.4);
+  animation:shake .4s ease;
+}
+.option.dim{opacity:.25;pointer-events:none}
+
+/* Panel bantuan */
+.assist-panel{
+  margin-top:11px;
+  border-radius:13px;
+  padding:12px;
+  background:rgba(6,14,28,.9);
+  border:1px dashed rgba(79,195,247,.45);
+  font-size:12.5px;
+  line-height:1.55;
+  animation:fadeUp .3s ease both;
+}
+.assist-panel h4{
+  font-size:11px;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  color:var(--blue);
+  margin-bottom:8px;
+}
+.poll{display:flex;flex-direction:column;gap:7px}
+.poll-row{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.poll-row .lb{font-family:'Orbitron',sans-serif;color:var(--gold);width:14px}
+.poll-bar{
+  flex:1;
+  height:16px;
+  border-radius:8px;
+  background:rgba(255,255,255,.07);
+  overflow:hidden;
+}
+.poll-fill{
+  height:100%;
+  width:0;
+  border-radius:8px;
+  background:linear-gradient(90deg,var(--blue),#2196f3);
+  transition:width .7s cubic-bezier(.2,.9,.3,1);
+}
+.poll-row .pc{width:34px;text-align:right;font-weight:600;font-family:'Orbitron',sans-serif;font-size:11px}
+
+/* ============ OVERLAY / MODAL ============ */
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:rgba(2,6,14,.78);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  animation:fade .25s ease both;
+}
+.modal{
+  width:100%;
+  max-width:420px;
+  background:linear-gradient(180deg,rgba(16,30,56,.98),rgba(7,14,28,.98));
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px 17px;
+  text-align:center;
+  animation:pop .32s cubic-bezier(.2,1.3,.5,1) both;
+  max-height:88vh;
+  overflow-y:auto;
+}
+.modal .badge{
+  font-size:44px;
+  line-height:1;
+  margin-bottom:8px;
+  display:block;
+}
+.modal h2{
+  font-family:'Orbitron',sans-serif;
+  font-size:19px;
+  margin-bottom:8px;
+}
+.modal h2.ok{color:var(--green)}
+.modal h2.no{color:var(--red)}
+.modal p{
+  font-size:13px;
+  line-height:1.6;
+  color:#c8dcf0;
+  margin-bottom:14px;
+}
+.modal .reward{
+  font-family:'Orbitron',sans-serif;
+  font-size:24px;
+  color:var(--gold);
+  margin:6px 0 14px;
+  text-shadow:0 0 22px rgba(255,201,60,.4);
+}
+.modal .explain{
+  text-align:left;
+  font-size:12.5px;
+  line-height:1.6;
+  background:rgba(79,195,247,.08);
+  border-left:3px solid var(--blue);
+  border-radius:0 10px 10px 0;
+  padding:10px 12px;
+  margin-bottom:15px;
+  color:#cfe6ff;
+}
+
+/* Ladder */
+.ladder-list{
+  list-style:none;
+  display:flex;
+  flex-direction:column-reverse;
+  gap:5px;
+  max-height:55vh;
+  overflow-y:auto;
+  margin-bottom:14px;
+}
+.ladder-list li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12.5px;
+  padding:7px 11px;
+  border-radius:9px;
+  border:1px solid transparent;
+  color:#b9d2ea;
+}
+.ladder-list li .lv{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--muted);width:22px;text-align:left}
+.ladder-list li .pr{font-family:'Orbitron',sans-serif;font-size:12px}
+.ladder-list li.safe{border-color:rgba(255,201,60,.35);background:rgba(255,201,60,.07)}
+.ladder-list li.safe .pr{color:var(--gold)}
+.ladder-list li.now{
+  background:linear-gradient(90deg,rgba(255,201,60,.28),rgba(255,159,28,.14));
+  border-color:var(--gold);
+  color:#fff;
+  font-weight:600;
+}
+.ladder-list li.done .pr{color:var(--green)}
+
+/* Confetti */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.conf{
+  position:absolute;
+  top:-14px;
+  width:9px;
+  height:14px;
+  border-radius:2px;
+  animation:fall linear forwards;
+}
+
+/* ============ ANIMASI ============ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pulseOk{0%{transform:scale(1)}45%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes fall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(105vh) rotate(720deg);opacity:.15}
+}
+@keyframes glowPulse{
+  0%,100%{box-shadow:0 6px 20px rgba(255,159,28,.35)}
+  50%{box-shadow:0 6px 30px rgba(255,201,60,.7)}
+}
+.btn-primary{animation:glowPulse 2.6s ease-in-out infinite}
+</style>
+</head>
+
+<body>
+<!-- Kanvas WebGL latar belakang -->
+<canvas id="bg-canvas"></canvas>
+<div id="confetti"></div>
+
+<div class="app">
+
+  <!-- ============ LAYAR HOME ============ -->
+  <section id="screen-home" class="home-wrap">
+    <div class="logo">
+      <div class="kecil">Kimia Kelas XI</div>
+      <h1>KIMIA<br>MILLIONAIRE</h1>
+      <p>Termokimia — Sistem, Lingkungan,<br>Reaksi Eksoterm &amp; Endoterm</p>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label for="input-name">Nama Pemain</label>
+        <input id="input-name" type="text" maxlength="18" placeholder="Tulis namamu di sini..." autocomplete="off">
+      </div>
+      <div style="height:12px"></div>
+      <button id="btn-start" class="btn btn-primary">🎯 MULAI BERMAIN</button>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><b id="st-best">0</b><span>Skor Terbaik</span></div>
+      <div class="stat"><b id="st-last">0</b><span>Skor Terakhir</span></div>
+      <div class="stat"><b id="st-play">0</b><span>Kali Bermain</span></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🏆 Papan Peringkat Lokal</div>
+      <ul id="rank-list" class="rank-list"></ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title">💾 Data Permainan</div>
+      <button id="btn-download" class="btn btn-ghost" style="margin-bottom:9px">⬇ Unduh Riwayat (.json)</button>
+      <button id="btn-reset" class="btn btn-ghost" style="color:var(--red);border-color:rgba(231,76,60,.4)">🗑 Reset Semua Data</button>
+    </div>
+
+    <p style="text-align:center;font-size:10.5px;color:var(--muted);padding:4px 0 10px">
+      Dibuat untuk pembelajaran Kimia Kelas XI · Termokimia
+    </p>
+  </section>
+
+  <!-- ============ LAYAR GAME ============ -->
+  <section id="screen-game" class="game-wrap hidden">
+    <div class="game-top">
+      <button id="btn-quit" class="chip">← Keluar</button>
+      <div class="spacer"></div>
+      <div class="chip" id="chip-qnum">Soal 1/15</div>
+      <button id="btn-ladder" class="chip gold" id="chip-prize">💰 Rp 0</button>
+    </div>
+
+    <div class="lifelines">
+      <button class="life" id="life-50" data-life="fifty">
+        <span class="ico">✂️</span><span>50 : 50</span>
+      </button>
+      <button class="life" id="life-aud" data-life="audience">
+        <span class="ico">👥</span><span>Tanya Penonton</span>
+      </button>
+      <button class="life" id="life-phn" data-life="phone">
+        <span class="ico">📞</span><span>Telepon Teman</span>
+      </button>
+    </div>
+
+    <div class="q-card">
+      <div class="q-meta">
+        <span id="q-stage">Stage 1 · Mudah</span>
+        <span id="q-value">Rp 100</span>
+      </div>
+      <div class="q-text" id="q-text">Memuat soal...</div>
+      <div class="options" id="options"></div>
+      <div id="assist-slot"></div>
+    </div>
+  </section>
+
+  <!-- ============ LAYAR AKHIR ============ -->
+  <section id="screen-end" class="home-wrap hidden">
+    <div class="card" style="text-align:center">
+      <span id="end-emoji" style="font-size:52px;display:block;line-height:1">🏁</span>
+      <h2 id="end-title" style="font-family:'Orbitron',sans-serif;font-size:20px;margin:10px 0 6px">Permainan Selesai</h2>
+      <p id="end-sub" style="font-size:13px;color:var(--muted);line-height:1.6"></p>
+      <div class="reward" id="end-score" style="font-family:'Orbitron',sans-serif;font-size:26px;color:var(--gold);margin:14px 0">Rp 0</div>
+      <button id="btn-again" class="btn btn-primary" style="margin-bottom:9px">🔁 Main Lagi</button>
+      <button id="btn-home" class="btn btn-ghost" style="margin-bottom:9px">🏠 Kembali ke Menu</button>
+      <button id="btn-download-2" class="btn btn-ghost">⬇ Unduh Riwayat (.json)</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ OVERLAY: TANGGA HADIAH ============ -->
+<div id="overlay-ladder" class="overlay hidden">
+  <div class="modal">
+    <h2 style="margin-bottom:14px">💰 Tangga Hadiah</h2>
+    <ul class="ladder-list" id="ladder-list"></ul>
+    <button id="btn-close-ladder" class="btn btn-ghost">Tutup</button>
+  </div>
+</div>
+
+<!-- ============ OVERLAY: UMPAN BALIK ============ -->
+<div id="overlay-feedback" class="overlay hidden">
+  <div class="modal">
+    <span class="badge" id="fb-emoji">✅</span>
+    <h2 id="fb-title" class="ok">Jawaban Benar!</h2>
+    <div class="reward" id="fb-reward">Rp 100</div>
+    <div class="explain" id="fb-explain"></div>
+    <button id="btn-fb-next" class="btn btn-primary">Lanjut →</button>
+  </div>
+</div>
+
+<!-- ============ OVERLAY: KONFIRMASI ============ -->
+<div id="overlay-confirm" class="overlay hidden">
+  <div class="modal">
+    <span class="badge">⚠️</span>
+    <h2 id="cf-title">Yakin?</h2>
+    <p id="cf-text">Tindakan ini tidak bisa dibatalkan.</p>
+    <button id="cf-yes" class="btn btn-primary" style="margin-bottom:9px">Ya, Lanjutkan</button>
+    <button id="cf-no" class="btn btn-ghost">Batal</button>
+  </div>
+</div>
+
+<!-- ============ LIBRARY WEBGL (CDN HTTPS) ============ -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+
+<script>
+/* =====================================================================
+   KIMIA MILLIONAIRE — Termokimia Kelas XI
+   Single-file HTML + CSS + JS murni. Tanpa framework / build tools.
+   ===================================================================== */
+
+/* ------------------------------------------------------------------
+   1. BANK SOAL (15 soal, 3 stage)
+   ------------------------------------------------------------------ */
+const QUESTIONS = [
+  /* ================= STAGE 1 — MUDAH (soal 1–5) ================= */
+  {
+    stage: 1,
+    q: "Dalam termokimia, bagian dari alam semesta yang menjadi pusat perhatian dan diteliti disebut ....",
+    options: ["Lingkungan", "Sistem", "Kalor", "Entalpi"],
+    correct: 1,
+    explanation: "Sistem adalah bagian alam semesta yang menjadi pusat perhatian, sedangkan lingkungan adalah segala sesuatu di luar sistem.",
+    hint: "Bayangkan kamu mengamati air di dalam gelas — air itulah yang jadi pusat perhatianmu."
+  },
+  {
+    stage: 1,
+    q: "Segala sesuatu di luar sistem yang dapat memengaruhi sistem disebut ....",
+    options: ["Lingkungan", "Reaksi", "Sistem terisolasi", "Kerja"],
+    correct: 0,
+    explanation: "Lingkungan adalah segala sesuatu di luar sistem yang berinteraksi dengan sistem.",
+    hint: "Kebalikan dari 'sistem'."
+  },
+  {
+    stage: 1,
+    q: "Reaksi yang melepaskan kalor dari sistem ke lingkungan disebut reaksi ....",
+    options: ["Endoterm", "Eksoterm", "Netral", "Isoterm"],
+    correct: 1,
+    explanation: "Eksoterm berasal dari kata 'ekso' (keluar) dan 'term' (kalor), artinya kalor keluar dari sistem.",
+    hint: "Awalan 'ekso-' berarti keluar."
+  },
+  {
+    stage: 1,
+    q: "Reaksi yang menyerap kalor dari lingkungan ke sistem disebut reaksi ....",
+    options: ["Eksoterm", "Eksogen", "Endoterm", "Ekspansi"],
+    correct: 2,
+    explanation: "Endoterm berasal dari kata 'endo' (ke dalam), artinya kalor masuk ke dalam sistem.",
+    hint: "Awalan 'endo-' berarti ke dalam."
+  },
+  {
+    stage: 1,
+    q: "Jika ΔH suatu reaksi bernilai negatif (ΔH < 0), maka reaksi tersebut bersifat ....",
+    options: ["Endoterm", "Eksoterm", "Tidak terjadi reaksi", "Menyerap kalor"],
+    correct: 1,
+    explanation: "ΔH negatif berarti sistem melepaskan kalor ke lingkungan, sehingga reaksinya eksoterm.",
+    hint: "Tanda negatif menunjukkan kalor keluar dari sistem."
+  },
+
+  /* ================= STAGE 2 — SEDANG (soal 6–10) ================= */
+  {
+    stage: 2,
+    q: "Ciri yang dapat diamati pada reaksi eksoterm adalah ....",
+    options: ["Suhu lingkungan menjadi turun", "Suhu lingkungan menjadi naik", "Terbentuk gas", "Warna larutan memudar"],
+    correct: 1,
+    explanation: "Karena sistem melepaskan kalor ke lingkungan, suhu lingkungan (dan biasanya suhu larutan) menjadi naik.",
+    hint: "Kalor yang dilepaskan akan terasa di sekitar wadah reaksi."
+  },
+  {
+    stage: 2,
+    q: "Ciri yang dapat diamati pada reaksi endoterm adalah ....",
+    options: ["Suhu lingkungan naik", "Suhu sistem naik", "Suhu lingkungan turun", "Terjadi ledakan"],
+    correct: 2,
+    explanation: "Endoterm menyerap kalor dari lingkungan, sehingga lingkungan kehilangan kalor dan suhunya turun.",
+    hint: "Karena kalor diserap sistem, lingkungan kehilangan kalor."
+  },
+  {
+    stage: 2,
+    q: "Contoh peristiwa endoterm dalam kehidupan sehari-hari adalah ....",
+    options: ["Pembakaran kayu", "Fotosintesis pada tumbuhan", "Respirasi sel", "Pembakaran bahan bakar"],
+    correct: 1,
+    explanation: "Fotosintesis menyerap energi cahaya matahari untuk membentuk glukosa, sehingga termasuk reaksi endoterm.",
+    hint: "Peristiwa ini membutuhkan energi cahaya matahari untuk berlangsung."
+  },
+  {
+    stage: 2,
+    q: "Pembakaran kayu di tungku menghasilkan panas yang terasa di sekitar. Reaksi ini termasuk ....",
+    options: ["Endoterm", "Eksoterm", "Isoterm", "Adiabatik"],
+    correct: 1,
+    explanation: "Pembakaran melepaskan kalor ke lingkungan sehingga terasa panas — termasuk reaksi eksoterm.",
+    hint: "Kamu merasakan panas, artinya kalor dilepaskan ke sekitarmu."
+  },
+  {
+    stage: 2,
+    q: "Sistem yang tidak memungkinkan terjadinya pertukaran materi maupun energi dengan lingkungan disebut sistem ....",
+    options: ["Terbuka", "Tertutup", "Terisolasi", "Adiabatik"],
+    correct: 2,
+    explanation: "Sistem terisolasi tidak dapat bertukar materi maupun energi dengan lingkungannya.",
+    hint: "Kata 'terisolasi' berarti benar-benar terpisah dari lingkungan."
+  },
+
+  /* ================= STAGE 3 — SULIT (soal 11–15) ================= */
+  {
+    stage: 3,
+    q: "Sebuah tabung reaksi berisi air, lalu ditambahkan NaOH padat. Ternyata suhu larutan naik. Peristiwa ini termasuk ....",
+    options: [
+      "Endoterm karena menyerap kalor",
+      "Eksoterm karena melepaskan kalor",
+      "Endoterm karena suhu naik",
+      "Bukan reaksi termokimia"
+    ],
+    correct: 1,
+    explanation: "Pelarutan NaOH melepaskan kalor ke lingkungan sehingga suhu larutan naik. Ini adalah contoh reaksi eksoterm.",
+    hint: "Suhu yang naik menandakan ada kalor yang dilepaskan ke lingkungan."
+  },
+  {
+    stage: 3,
+    q: "Reaksi Ba(OH)₂·8H₂O(s) + 2NH₄Cl(s) → BaCl₂(s) + 2NH₃(g) + 10H₂O(l) menyebabkan suhu campuran turun. Nilai ΔH reaksi tersebut ....",
+    options: ["Negatif", "Positif", "Nol", "Tidak dapat ditentukan"],
+    correct: 1,
+    explanation: "Suhu turun menandakan reaksi menyerap kalor (endoterm). Reaksi endoterm selalu memiliki ΔH bertanda positif.",
+    hint: "Endoterm selalu memiliki ΔH bertanda apa?"
+  },
+  {
+    stage: 3,
+    q: "Pada reaksi eksoterm, arah perpindahan kalor yang benar adalah ....",
+    options: [
+      "Dari lingkungan ke sistem",
+      "Dari sistem ke lingkungan",
+      "Dari sistem ke sistem",
+      "Tidak terjadi perpindahan kalor"
+    ],
+    correct: 1,
+    explanation: "Eksoterm berarti kalor keluar dari sistem menuju lingkungan.",
+    hint: "'Ekso' berarti keluar, jadi kalor bergerak keluar dari sistem."
+  },
+  {
+    stage: 3,
+    q: "Diketahui: 2H₂(g) + O₂(g) → 2H₂O(g)   ΔH = –571 kJ. Pernyataan yang benar adalah ....",
+    options: [
+      "Reaksi menyerap 571 kJ kalor dari lingkungan",
+      "Reaksi melepaskan 571 kJ kalor ke lingkungan",
+      "Suhu lingkungan turun",
+      "Reaksi berlangsung endoterm"
+    ],
+    correct: 1,
+    explanation: "ΔH bertanda negatif menunjukkan reaksi eksoterm, yaitu melepaskan 571 kJ kalor ke lingkungan.",
+    hint: "Perhatikan tanda ΔH: negatif atau positif?"
+  },
+  {
+    stage: 3,
+    q: "Diketahui: N₂(g) + O₂(g) → 2NO(g)   ΔH = +180 kJ. Pernyataan yang benar adalah ....",
+    options: [
+      "Reaksi melepaskan 180 kJ kalor ke lingkungan",
+      "Reaksi menyerap 180 kJ kalor dari lingkungan",
+      "Reaksi berlangsung secara eksoterm",
+      "Suhu lingkungan naik"
+    ],
+    correct: 1,
+    explanation: "ΔH bertanda positif menunjukkan reaksi endoterm, yaitu menyerap 180 kJ kalor dari lingkungan.",
+    hint: "Tanda ΔH positif berarti kalor masuk ke dalam sistem."
+  }
+];
+
+/* ------------------------------------------------------------------
+   2. KONFIGURASI HADIAH
+   ------------------------------------------------------------------ */
+const PRIZES = [
+  100, 200, 300, 500, 1000,
+  2000, 4000, 8000, 16000, 32000,
+  64000, 125000, 250000, 500000, 1000000
+];
+const SAFE_INDEXES = [4, 9]; // soal ke-5 dan ke-10 = titik aman (checkpoint)
+const STAGE_LABEL = { 1: "Stage 1 · Mudah", 2: "Stage 2 · Sedang", 3: "Stage 3 · Sulit" };
+
+/* ------------------------------------------------------------------
+   3. PENYIMPANAN DATA (localStorage + JSON)
+   ------------------------------------------------------------------ */
+const STORAGE_KEY = "wwtbam_chem_xi";
+
+function defaultData() {
+  return {
+    playerName: "",
+    bestScore: 0,
+    lastScore: 0,
+    gamesPlayed: 0,
+    history: []
+  };
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultData();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultData(), parsed);
+  } catch (e) {
+    console.warn("Gagal membaca data, memakai data default.", e);
+    return defaultData();
+  }
+}
+
+function saveData(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn("Gagal menyimpan data.", e);
+  }
+}
+
+/* Unduh isi localStorage sebagai file .json */
+function downloadJSON() {
+  const data = loadData();
+  const payload = {
+    aplikasi: "Kimia Millionaire - Termokimia Kelas XI",
+    diekspor: new Date().toISOString(),
+    data: data
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const nama = (data.playerName || "pemain").replace(/[^a-zA-Z0-9]/g, "_");
+  a.href = url;
+  a.download = "riwayat-wwtbam-" + nama + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+/* Format angka rupiah */
+function rp(n) {
+  return "Rp " + n.toLocaleString("id-ID");
+}
+
+/* ------------------------------------------------------------------
+   4. STATE PERMAINAN
+   ------------------------------------------------------------------ */
+const state = {
+  playerName: "",
+  current: 0,        // indeks soal aktif (0–14)
+  safeScore: 0,      // skor aman terakhir
+  score: 0,          // skor saat ini
+  answered: false,
+  lifelines: { fifty: false, audience: false, phone: false },
+  lifelinesUsed: [],
+  optionMap: [],     // posisi tampil -> indeks asli opsi
+  hiddenOptions: []  // posisi tampil yang dihilangkan (efek 50:50)
+};
+
+/* ------------------------------------------------------------------
+   5. REFERENSI ELEMEN
+   ------------------------------------------------------------------ */
+const el = (id) => document.getElementById(id);
+
+const screenHome = el("screen-home");
+const screenGame = el("screen-game");
+const screenEnd  = el("screen-end");
+
+const overlayLadder   = el("overlay-ladder");
+const overlayFeedback = el("overlay-feedback");
+const overlayConfirm  = el("overlay-confirm");
+
+/* ------------------------------------------------------------------
+   6. THREE.JS — BACKGROUND WEBGL
+   ------------------------------------------------------------------ */
+let three = { renderer: null, scene: null, camera: null, points: null, pointsMat: null, ico: null, icoMat: null };
+let targetColor = null;
+let clock = null;
+
+function initThree() {
+  if (typeof THREE === "undefined") {
+    console.warn("Three.js tidak tersedia. Latar belakang WebGL dilewati.");
+    return;
+  }
+  const canvas = el("bg-canvas");
+  const W = window.innerWidth, H = window.innerHeight;
+
+  three.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  three.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  three.renderer.setSize(W, H, false);
+
+  three.scene = new THREE.Scene();
+  three.camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 500);
+  three.camera.position.z = 34;
+
+  /* --- Partikel berbentuk bola (mewakili molekul) --- */
+  const COUNT = 340;
+  const positions = new Float32Array(COUNT * 3);
+  for (let i = 0; i < COUNT; i++) {
+    const r = 17 + Math.random() * 9;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = r * Math.cos(phi);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+  three.pointsMat = new THREE.PointsMaterial({
+    color: 0x4fc3f7,
+    size: 0.55,
+    transparent: true,
+    opacity: 0.85,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  three.points = new THREE.Points(geo, three.pointsMat);
+  three.scene.add(three.points);
+
+  /* --- Icosahedron wireframe (mewakili struktur molekul) --- */
+  const icoGeo = new THREE.IcosahedronGeometry(9, 1);
+  three.icoMat = new THREE.MeshBasicMaterial({
+    color: 0xffc93c,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.16
+  });
+  three.ico = new THREE.Mesh(icoGeo, three.icoMat);
+  three.scene.add(three.ico);
+
+  targetColor = new THREE.Color(0x4fc3f7);
+  clock = new THREE.Clock();
+
+  window.addEventListener("resize", onResize);
+  animateThree();
+}
+
+function onResize() {
+  if (!three.renderer) return;
+  const W = window.innerWidth, H = window.innerHeight;
+  three.camera.aspect = W / H;
+  three.camera.updateProjectionMatrix();
+  three.renderer.setSize(W, H, false);
+}
+
+function animateThree() {
+  requestAnimationFrame(animateThree);
+  if (!three.renderer) return;
+
+  const t = clock.getElapsedTime();
+
+  three.points.rotation.y = t * 0.055;
+  three.points.rotation.x = Math.sin(t * 0.13) * 0.18;
+
+  three.ico.rotation.y = -t * 0.16;
+  three.ico.rotation.z = t * 0.09;
+
+  // Transisi warna halus menuju warna target
+  if (targetColor) {
+    three.pointsMat.color.lerp(targetColor, 0.045);
+    three.icoMat.color.lerp(targetColor, 0.03);
+  }
+
+  three.renderer.render(three.scene, three.camera);
+}
+
+/* Ubah warna latar WebGL (dipakai saat jawaban benar/salah) */
+function pulseThreeColor(hex) {
+  if (typeof THREE === "undefined" || !targetColor) return;
+  targetColor = new THREE.Color(hex);
+}
+
+/* ------------------------------------------------------------------
+   7. NAVIGASI LAYAR
+   ------------------------------------------------------------------ */
+function showScreen(name) {
+  screenHome.classList.add("hidden");
+  screenGame.classList.add("hidden");
+  screenEnd.classList.add("hidden");
+  if (name === "home") screenHome.classList.remove("hidden");
+  if (name === "game") screenGame.classList.remove("hidden");
+  if (name === "end")  screenEnd.classList.remove("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function openOverlay(o) { o.classList.remove("hidden"); }
+function closeOverlay(o) { o.classList.add("hidden"); }
+
+/* ------------------------------------------------------------------
+   8. HOME SCREEN — RENDER STATISTIK & LEADERBOARD
+   ------------------------------------------------------------------ */
+function renderHome() {
+  const data = loadData();
+
+  el("st-best").textContent = data.bestScore.toLocaleString("id-ID");
+  el("st-last").textContent = data.lastScore.toLocaleString("id-ID");
+  el("st-play").textContent = data.gamesPlayed;
+
+  if (data.playerName) el("input-name").value = data.playerName;
+
+  const list = el("rank-list");
+  list.innerHTML = "";
+
+  if (!data.history.length) {
+    list.innerHTML = '<li class="empty" style="border:none;background:none">Belum ada riwayat permainan.</li>';
+    return;
+  }
+
+  const top = data.history
+    .slice()
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+
+  const medal = ["🥇", "🥈", "🥉", "4.", "5."];
+  top.forEach((item, i) => {
+    const li = document.createElement("li");
+    const tgl = new Date(item.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
+    li.innerHTML =
+      '<span class="no">' + medal[i] + '</span>' +
+      '<span class="nm">' + escapeHtml(item.name || "Anonim") + ' <span style="color:var(--muted);font-size:10.5px">· ' + tgl + '</span></span>' +
+      '<span class="sc">' + item.score.toLocaleString("id-ID") + '</span>';
+    list.appendChild(li);
+  });
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+/* ------------------------------------------------------------------
+   9. MULAI PERMAINAN
+   ------------------------------------------------------------------ */
+function startGame() {
+  const nama = el("input-name").value.trim();
+  if (!nama) {
+    el("input-name").focus();
+    el("input-name").style.borderColor = "var(--red)";
+    setTimeout(() => { el("input-name").style.borderColor = ""; }, 1200);
+    return;
+  }
+
+  // Simpan nama pemain
+  const data = loadData();
+  data.playerName = nama;
+  saveData(data);
+
+  // Reset state
+  state.playerName = nama;
+  state.current = 0;
+  state.safeScore = 0;
+  state.score = 0;
+  state.answered = false;
+  state.lifelines = { fifty: false, audience: false, phone: false };
+  state.lifelinesUsed = [];
+
+  // Reset UI lifelines
+  document.querySelectorAll(".life").forEach((b) => b.classList.remove("used"));
+
+  // Reset warna latar
+  pulseThreeColor(0x4fc3f7);
+
+  showScreen("game");
+  renderQuestion();
+}
+
+/* ------------------------------------------------------------------
+   10. RENDER SOAL
+   ------------------------------------------------------------------ */
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.current];
+  const idx = state.current;
+
+  state.answered = false;
+  state.hiddenOptions = [];
+  el("assist-slot").innerHTML = "";
+
+  // Acak urutan opsi agar tidak berpola
+  const order = shuffleArray([0, 1, 2, 3]);
+  state.optionMap = order;
+
+  // Header
+  el("chip-qnum").textContent = "Soal " + (idx + 1) + "/15";
+  el("btn-ladder").textContent = "💰 " + rp(state.score);
+  el("q-stage").textContent = STAGE_LABEL[q.stage];
+  el("q-value").textContent = rp(PRIZES[idx]);
+  el("q-text").textContent = q.q;
+
+  // Tombol opsi
+  const letters = ["A", "B", "C", "D"];
+  const box = el("options");
+  box.innerHTML = "";
+
+  order.forEach((origIdx, displayIdx) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.type = "button";
+    btn.dataset.display = displayIdx;
+    btn.innerHTML =
+      '<span class="letter">' + letters[displayIdx] + '</span>' +
+      '<span class="txt">' + escapeHtml(q.options[origIdx]) + '</span>';
+    btn.addEventListener("click", () => selectAnswer(displayIdx));
+    box.appendChild(btn);
+  });
+}
+
+/* ------------------------------------------------------------------
+   11. PILIH JAWABAN
+   ------------------------------------------------------------------ */
+function selectAnswer(displayIdx) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const q = QUESTIONS[state.current];
+  const originalIdx = state.optionMap[displayIdx];
+  const isCorrect = originalIdx === q.correct;
+  const correctDisplay = state.optionMap.indexOf(q.correct);
+
+  const buttons = document.querySelectorAll("#options .option");
+  buttons.forEach((b) => { b.style.pointerEvents = "none"; });
+
+  if (isCorrect) {
+    buttons[displayIdx].classList.add("correct");
+    pulseThreeColor(0xff8a2b); // warna hangat = eksoterm (benar)
+    state.score = PRIZES[state.current];
+
+    if (SAFE_INDEXES.includes(state.current)) {
+      state.safeScore = state.score;
+    }
+    if (state.current === 14) {
+      state.safeScore = PRIZES[14];
+    }
+  } else {
+    buttons[displayIdx].classList.add("wrong");
+    if (correctDisplay >= 0) buttons[correctDisplay].classList.add("correct");
+    pulseThreeColor(0x2f6fe0); // warna dingin = endoterm (salah)
+  }
+
+  el("btn-ladder").textContent = "💰 " + rp(isCorrect ? state.score : state.safeScore);
+
+  // Tampilkan umpan balik setelah animasi
+  setTimeout(() => showFeedback(isCorrect, q), 1150);
+}
+
+/* ------------------------------------------------------------------
+   12. UMPAN BALIK
+   ------------------------------------------------------------------ */
+function showFeedback(isCorrect, q) {
+  el("fb-emoji").textContent = isCorrect ? "✅" : "❌";
+  el("fb-title").textContent = isCorrect ? "Jawaban Benar!" : "Jawaban Salah";
+  el("fb-title").className = isCorrect ? "ok" : "no";
+  el("fb-reward").textContent = isCorrect
+    ? rp(PRIZES[state.current])
+    : "Hadiah aman: " + rp(state.safeScore);
+  el("fb-explain").innerHTML = "<strong>Penjelasan:</strong> " + escapeHtml(q.explanation);
+
+  const nextBtn = el("btn-fb-next");
+  if (state.current === 14 && isCorrect) {
+    nextBtn.textContent = "Lihat Hasil 🏆";
+  } else if (!isCorrect) {
+    nextBtn.textContent = "Lihat Hasil →";
+  } else {
+    nextBtn.textContent = "Soal Berikutnya →";
+  }
+
+  openOverlay(overlayFeedback);
+}
+
+function handleFeedbackNext() {
+  closeOverlay(overlayFeedback);
+  const lastCorrect = state.score === PRIZES[state.current] && state.current <= 14;
+  const q = QUESTIONS[state.current];
+  const originalIdx = state.optionMap.indexOf(q.correct);
+  const benar = state.optionMap[state.hiddenOptions.length >= 0 ? 0 : 0] !== undefined; // placeholder
+
+  // Cek status sebenarnya dari jawaban terakhir
+  const answeredCorrectly = state.score === PRIZES[state.current];
+
+  if (answeredCorrectly) {
+    if (state.current === 14) {
+      endGame(true);
+    } else {
+      state.current++;
+      renderQuestion();
+      pulseThreeColor(0x4fc3f7);
+    }
+  } else {
+    endGame(false);
+  }
+}
+
+/* ------------------------------------------------------------------
+   13. AKHIR PERMAINAN
+   ------------------------------------------------------------------ */
+function endGame(isWin) {
+  let finalScore;
+  let title, sub, emoji;
+
+  if (isWin) {
+    finalScore = PRIZES[14];
+    emoji = "🏆";
+    title = "LUAR BIASA!";
+    sub = "Kamu berhasil menjawab seluruh 15 soal Termokimia dengan tepat. Kamu benar-benar seorang Millionaire Kimia!";
+    launchConfetti();
+    pulseThreeColor(0xffc93c);
+  } else {
+    finalScore = state.safeScore;
+    emoji = "🏁";
+    title = "Permainan Berakhir";
+    sub = "Kamu berhenti di soal ke-" + (state.current + 1) +
+          ". Kamu membawa pulang hadiah aman terakhir. Coba lagi, kamu pasti bisa!";
+    pulseThreeColor(0x2f6fe0);
+  }
+
+  // Simpan ke localStorage
+  const data = loadData();
+  data.playerName = state.playerName;
+  data.lastScore = finalScore;
+  data.gamesPlayed += 1;
+  if (finalScore > data.bestScore) data.bestScore = finalScore;
+  data.history.push({
+    name: state.playerName,
+    date: new Date().toISOString(),
+    score: finalScore,
+    reachedQuestion: state.current + 1,
+    win: isWin,
+    lifelinesUsed: state.lifelinesUsed.slice()
+  });
+  // Batasi riwayat maksimal 50 entri
+  if (data.history.length > 50) data.history = data.history.slice(-50);
+  saveData(data);
+
+  // Tampilkan layar akhir
+  el("end-emoji").textContent = emoji;
+  el("end-title").textContent = title;
+  el("end-sub").textContent = sub;
+  el("end-score").textContent = rp(finalScore);
+
+  showScreen("end");
+  renderHome();
+}
+
+/* ------------------------------------------------------------------
+   14. LIFELINES
+   ------------------------------------------------------------------ */
+function useLifeline(type) {
+  if (state.answered) return;
+  if (state.lifelines[type]) return;
+
+  const q = QUESTIONS[state.current];
+
+  /* ---------- 50 : 50 ---------- */
+  if (type === "fifty") {
+    const correctDisplay = state.optionMap.indexOf(q.correct);
+    const wrongDisplays = [0, 1, 2, 3].filter((i) => i !== correctDisplay);
+    shuffleArray(wrongDisplays);
+    const toHide = wrongDisplays.slice(0, 2);
+
+    const buttons = document.querySelectorAll("#options .option");
+    toHide.forEach((i) => {
+      buttons[i].classList.add("dim");
+      state.hiddenOptions.push(i);
+    });
+
+    state.lifelines.fifty = true;
+    el("life-50").classList.add("used");
+    state.lifelinesUsed.push("50:50");
+  }
+
+  /* ---------- TANYA PENONTON ---------- */
+  if (type === "audience") {
+    const correctDisplay = state.optionMap.indexOf(q.correct);
+
+    // Bobot acak; jawaban benar cenderung tertinggi
+    let weights = [0, 0, 0, 0].map(() => Math.random() * 25 + 5);
+    weights[correctDisplay] = 45 + Math.random() * 30;
+
+    // Opsi yang sudah dihilangkan mendapat 0
+    state.hiddenOptions.forEach((i) => { weights[i] = 0; });
+
+    const sum = weights.reduce((a, b) => a + b, 0) || 1;
+    let pct = weights.map((w) => Math.round((w / sum) * 100));
+
+    // Koreksi pembulatan agar total 100
+    const diff = 100 - pct.reduce((a, b) => a + b, 0);
+    const maxIdx = pct.indexOf(Math.max(...pct));
+    pct[maxIdx] += diff;
+
+    const letters = ["A", "B", "C", "D"];
+    let html = '<div class="assist-panel"><h4>👥 Hasil Polling Penonton</h4><div class="poll">';
+    pct.forEach((p, i) => {
+      html +=
+        '<div class="poll-row">' +
+          '<span class="lb">' + letters[i] + '</span>' +
+          '<div class="poll-bar"><div class="poll-fill" data-pct="' + p + '"></div></div>' +
+          '<span class="pc">' + p + '%</span>' +
+        '</div>';
+    });
+    html += "</div></div>";
+
+    el("assist-slot").innerHTML = html;
+
+    // Animasi bar setelah render
+    setTimeout(() => {
+      document.querySelectorAll(".poll-fill").forEach((f) => {
+        f.style.width = f.dataset.pct + "%";
+      });
+    }, 60);
+
+    state.lifelines.audience = true;
+    el("life-aud").classList.add("used");
+    state.lifelinesUsed.push("Tanya Penonton");
+  }
+
+  /* ---------- TELEPON TEMAN ---------- */
+  if (type === "phone") {
+    const html =
+      '<div class="assist-panel"><h4>📞 Petunjuk dari Teman</h4>' +
+      "“" + escapeHtml(q.hint) + "”" +
+      "</div>";
+    el("assist-slot").innerHTML = html;
+
+    state.lifelines.phone = true;
+    el("life-phn").classList.add("used");
+    state.lifelinesUsed.push("Telepon Teman");
+  }
+}
+
+/* ------------------------------------------------------------------
+   15. TANGGA HADIAH
+   ------------------------------------------------------------------ */
+function buildLadder() {
+  const list = el("ladder-list");
+  list.innerHTML = "";
+
+  PRIZES.forEach((prize, i) => {
+    const li = document.createElement("li");
+    if (SAFE_INDEXES.includes(i)) li.classList.add("safe");
+    if (i < state.current) li.classList.add("done");
+    if (i === state.current) li.classList.add("now");
+
+    li.innerHTML =
+      '<span class="lv">' + (i + 1) + '</span>' +
+      '<span class="pr">' + rp(prize) + (SAFE_INDEXES.includes(i) ? " 🔒" : "") + '</span>';
+
+    list.appendChild(li);
+  });
+}
+
+/* ------------------------------------------------------------------
+   16. KONFETTI (untuk kemenangan)
+   ------------------------------------------------------------------ */
+function launchConfetti() {
+  const box = el("confetti");
+  box.innerHTML = "";
+  const colors = ["#ffc93c", "#ff9f1c", "#4fc3f7", "#2ecc71", "#e74c3c", "#ffffff"];
+
+  for (let i = 0; i < 70; i++) {
+    const d = document.createElement("div");
+    d.className = "conf";
+    d.style.left = Math.random() * 100 + "%";
+    d.style.background = colors[Math.floor(Math.random() * colors.length)];
+    d.style.animationDuration = (2 + Math.random() * 2.2) + "s";
+    d.style.animationDelay = (Math.random() * 1.1) + "s";
+    d.style.opacity = 0.7 + Math.random() * 0.3;
+    box.appendChild(d);
+  }
+  setTimeout(() => { box.innerHTML = ""; }, 5200);
+}
+
+/* ------------------------------------------------------------------
+   17. KONFIRMASI
+   ------------------------------------------------------------------ */
+let confirmCallback = null;
+
+function askConfirm(title, text, cb) {
+  el("cf-title").textContent = title;
+  el("cf-text").textContent = text;
+  confirmCallback = cb;
+  openOverlay(overlayConfirm);
+}
+
+/* ------------------------------------------------------------------
+   18. EVENT LISTENER
+   ------------------------------------------------------------------ */
+el("btn-start").addEventListener("click", startGame);
+
+el("input-name").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") startGame();
+});
+
+el("life-50").addEventListener("click", () => useLifeline("fifty"));
+el("life-aud").addEventListener("click", () => useLifeline("audience"));
+el("life-phn").addEventListener("click", () => useLifeline("phone"));
+
+el("btn-fb-next").addEventListener("click", handleFeedbackNext);
+
+el("btn-ladder").addEventListener("click", () => {
+  buildLadder();
+  openOverlay(overlayLadder);
+});
+el("btn-close-ladder").addEventListener("click", () => closeOverlay(overlayLadder));
+
+el("btn-quit").addEventListener("click", () => {
+  askConfirm(
+    "Keluar dari Permainan?",
+    "Progres kamu saat ini akan hilang dan tidak disimpan ke riwayat.",
+    () => {
+      closeOverlay(overlayConfirm);
+      pulseThreeColor(0x4fc3f7);
+      showScreen("home");
+      renderHome();
+    }
+  );
+});
+
+el("cf-yes").addEventListener("click", () => {
+  if (typeof confirmCallback === "function") confirmCallback();
+  confirmCallback = null;
+});
+el("cf-no").addEventListener("click", () => {
+  confirmCallback = null;
+  closeOverlay(overlayConfirm);
+});
+
+el("btn-again").addEventListener("click", () => {
+  showScreen("home");
+  renderHome();
+  startGame();
+});
+
+el("btn-home").addEventListener("click", () => {
+  pulseThreeColor(0x4fc3f7);
+  showScreen("home");
+  renderHome();
+});
+
+el("btn-download").addEventListener("click", downloadJSON);
+el("btn-download-2").addEventListener("click", downloadJSON);
+
+el("btn-reset").addEventListener("click", () => {
+  askConfirm(
+    "Reset Semua Data?",
+    "Seluruh riwayat permainan dan skor terbaik akan dihapus permanen dari perangkat ini.",
+    () => {
+      closeOverlay(overlayConfirm);
+      localStorage.removeItem(STORAGE_KEY);
+      el("input-name").value = "";
+      renderHome();
+    }
+  );
+});
+
+/* Tutup overlay dengan klik area gelap */
+[overlayLadder, overlayConfirm].forEach((ov) => {
+  ov.addEventListener("click", (e) => {
+    if (e.target === ov) closeOverlay(ov);
+  });
+});
+
+/* ------------------------------------------------------------------
+   19. INISIALISASI
+   ------------------------------------------------------------------ */
+(function init() {
+  initThree();
+  renderHome();
+  showScreen("home");
+})();
+</script>
+</body>
+</html>
